@@ -13,7 +13,7 @@ const clientTwitter = new TwitterApi({
 const callbackUrl =
   "http://127.0.0.1:5000/twitterbotrohit1997/us-central1/callback";
 
-// OpenAI API init
+// OpenAI
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
   organization: "<ORG_ID>",
@@ -21,7 +21,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-//First step
+//Auth
 exports.auth = functions.https.onRequest(async (request, response) => {
   const { url, codeVerifier, state } = clientTwitter.generateOAuth2AuthLink(
     callbackUrl,
@@ -34,7 +34,7 @@ exports.auth = functions.https.onRequest(async (request, response) => {
   response.redirect(url);
 });
 
-//Second step
+//Callback
 exports.callback = functions.https.onRequest(async (request, response) => {
   const { state, code } = request.query;
 
@@ -57,12 +57,12 @@ exports.callback = functions.https.onRequest(async (request, response) => {
 
   await databaseReference.set({ accessToken, refreshToken });
 
-  const { data } = await loggedClient.v2.me(); // start using the client if you want
+  const { data } = await loggedClient.v2.me();
 
   response.sendStatus(data);
 });
 
-//Third step
+//Tweet
 exports.tweet = functions.https.onRequest(async (request, response) => {
   const { refreshToken } = (await databaseReference.get()).data();
 
